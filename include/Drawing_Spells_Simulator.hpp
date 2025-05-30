@@ -4,5 +4,6 @@
 #pragma once
 
 #include <iostream>
+#include <entt/entt.hpp>
 
 // TODO: Reference additional headers your program requires here.

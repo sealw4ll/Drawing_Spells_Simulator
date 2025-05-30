@@ -1,0 +1,3 @@
+C:/Users/Wall/source/repos/Drawing_Spells_Simulator/build/CMakeFiles/Drawing_Spells_Simulator.dir
+C:/Users/Wall/source/repos/Drawing_Spells_Simulator/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/Wall/source/repos/Drawing_Spells_Simulator/build/CMakeFiles/ZERO_CHECK.dir
