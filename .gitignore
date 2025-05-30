@@ -12,6 +12,11 @@ vcpkg_installed/
 *.userosscache
 *.sln.docstates
 
+# VS Code / CMake cache
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
