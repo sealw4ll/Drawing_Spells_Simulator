@@ -16,6 +16,7 @@ vcpkg_installed/
 CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake
+Build/*
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
