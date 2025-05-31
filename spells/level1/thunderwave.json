@@ -1,0 +1,13 @@
+{
+    "name": "thunderwave",
+    "level": 1,
+    "damage_type": "thunder",
+    "range": 0,
+    "damage": 8,
+    "shape": {
+        "type": "square",
+        "size": 15
+    },
+    "duration": 0,
+    "casting_time": 1
+}

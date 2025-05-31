@@ -1,0 +1,13 @@
+{
+    "name": "telekinesis",
+    "level": 5,
+    "damage_type": "psychic",
+    "range": 60,
+    "damage": 3,
+    "shape": {
+        "type": "target",
+        "radius": 1
+    },
+    "duration": 10,
+    "casting_time": 5
+}

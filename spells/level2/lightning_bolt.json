@@ -1,0 +1,13 @@
+{
+    "name": "lightning bolt",
+    "level": 2,
+    "damage_type": "lightning",
+    "range": 100,
+    "damage": 24,
+    "shape": {
+        "type": "beam",
+        "size": 5
+    },
+    "duration": 0,
+    "casting_time": 2
+}

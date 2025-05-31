@@ -1,0 +1,13 @@
+{
+    "name": "ice storm",
+    "level": 4,
+    "damage_type": "ice",
+    "range": 300,
+    "damage": 20,
+    "shape": {
+        "type": "circle",
+        "radius": 20
+    },
+    "duration": 1,
+    "casting_time": 4
+}

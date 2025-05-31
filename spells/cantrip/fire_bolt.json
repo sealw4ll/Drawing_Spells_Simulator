@@ -1,0 +1,13 @@
+{
+    "name": "fire bolt",
+    "level": 0,
+    "damage_type": "fire",
+    "range": 120,
+    "damage": 5,
+    "shape": {
+        "type": "target",
+        "size": 0,
+    },
+    "duration": 0,
+    "casting_time": 1
+}

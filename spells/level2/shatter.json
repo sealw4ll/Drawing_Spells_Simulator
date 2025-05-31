@@ -1,0 +1,13 @@
+{
+    "name": "shatter",
+    "level": 2,
+    "damage_type": "thunder",
+    "range": 60,
+    "damage": 12,
+    "shape": {
+        "type": "circle",
+        "size": 10
+    },
+    "duration": 0,
+    "casting_time": 2
+}

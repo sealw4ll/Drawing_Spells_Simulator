@@ -1,4 +1,4 @@
-﻿#include "../include/Drawing_Spells_Simulator.hpp"
+﻿#include "main.hpp"
 
 using namespace std;
 

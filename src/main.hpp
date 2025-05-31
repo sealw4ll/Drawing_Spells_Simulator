@@ -4,6 +4,7 @@
 #pragma once
 
 #include <iostream>
+#include <raylib.h>
 #include <entt/entt.hpp>
 
 // TODO: Reference additional headers your program requires here.
