@@ -5,7 +5,7 @@
     "range": 100,
     "damage": 24,
     "shape": {
-        "type": "beam",
+        "type": "line",
         "size": 5
     },
     "duration": 0,

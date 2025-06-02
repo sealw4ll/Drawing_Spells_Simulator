@@ -6,7 +6,7 @@
     "damage": 3,
     "shape": {
         "type": "target",
-        "radius": 1
+        "size": 1
     },
     "duration": 10,
     "casting_time": 5

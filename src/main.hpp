@@ -6,5 +6,7 @@
 #include <iostream>
 #include <raylib.h>
 #include <entt/entt.hpp>
+#include "components/spell.hpp"
+#include "systems/spell_loader.hpp"
 
 // TODO: Reference additional headers your program requires here.
