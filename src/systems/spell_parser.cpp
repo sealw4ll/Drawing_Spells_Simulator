@@ -30,11 +30,12 @@ std::optional<Spell> parseSpell(const json& j) {
 std::optional<SpellIdentifier> parseIdentifier(const json& j) {
 	if (!j.contains("level") || !j.contains("damage_type")) return std::nullopt;
 
-	int level = j["level"].get<int>();
+	int levelInt = j["level"].get<int>();
+	LevelType level = parseDamageType(levelInt);
 	std::string typeStr = j["damage_type"].get<std::string>();
 	DamageType type = parseDamageType(typeStr);
 
-	if (level < 0 || type == DamageType::NONE) return std::nullopt;
+	if (level == LevelType::NONE || type == DamageType::NONE) return std::nullopt;
 	return SpellIdentifier{ level, type };
 }
 

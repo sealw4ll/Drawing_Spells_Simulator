@@ -7,7 +7,19 @@ DamageType parseDamageType(const std::string& str) {
 	if (str == "ice") return DamageType::ICE;
 	if (str == "lightning") return DamageType::LIGHTNING;
 	if (str == "psychic") return DamageType::PSYCHIC;
+	if (str == "force") return DamageType::FORCE;
 	return DamageType::NONE;
+}
+
+// Function to parse the level type from a int
+LevelType parseDamageType(const int level) {
+	if (level == 0) return LevelType::CANTRIP;
+	if (level == 1) return LevelType::LEVEL1;
+	if (level == 2) return LevelType::LEVEL2;
+	if (level == 3) return LevelType::LEVEL3;
+	if (level == 4) return LevelType::LEVEL4;
+	if (level == 5) return LevelType::LEVEL5;
+	return LevelType::NONE;
 }
 
 // Function to parse the shape type from a string
@@ -41,6 +53,18 @@ std::string damageTypeToString(DamageType type) {
 	case DamageType::LIGHTNING: return "lightning damage";
 	case DamageType::PSYCHIC: return "psychic damage";
 	default: return "none";
+	}
+}
+
+std::string levelTypeToString(LevelType level) {
+	switch (level) {
+	case LevelType::CANTRIP: return "cantrip spell";
+	case LevelType::LEVEL1: return "level 1 spell";
+	case LevelType::LEVEL2: return "level 2 spell";
+	case LevelType::LEVEL3: return "level 3 spell";
+	case LevelType::LEVEL4: return "level 4 spell";
+	case LevelType::LEVEL5: return "level 5 spell";
+	default: return "Invalid spell";
 	}
 }
 

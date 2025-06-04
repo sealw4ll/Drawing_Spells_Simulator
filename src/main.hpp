@@ -5,6 +5,7 @@
 #include <entt/entt.hpp>
 #include <vector>
 #include <cmath>
+#include <bitset>
 #include <utility>
 #include <raymath.h>
 
