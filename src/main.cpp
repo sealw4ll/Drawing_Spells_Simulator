@@ -47,6 +47,7 @@ Vector2 IsoToScreenInt(int x, int y) {
 	};
 }
 
+
 int main() {
 	GameObjects game;
 
@@ -61,11 +62,20 @@ int main() {
 	entt::entity drawingModule = createDrawingModule(game);
 	std::optional<entt::entity> spellCasted = std::nullopt;
 	Player player = game.registry.get<Player>(playerEntity);
+
+	// 3D camera setup
+	Camera camera = { 0 };
+	camera.position = { 400.0f, 300.0f, 600.0f }; // Camera position
+	camera.target = { 400.0f, 100.0f, 0.0f };     // Look at center of grid
+	camera.up = { 0.0f, 1.0f, 0.0f };             // Up vector
+	camera.fovy = 45.0f;
+	camera.projection = CAMERA_PERSPECTIVE;
+
 	while (!WindowShouldClose()) {
 		// --- Input ---
-		if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W)) player.position.y--;
+		if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W)) player.position.y++;
 		if (IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_A)) player.position.x--;
-		if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S)) player.position.y++;
+		if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S)) player.position.y--;
 		if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D)) player.position.x++;
 		game.mouse = GetMousePosition();
 
@@ -87,6 +97,7 @@ int main() {
 		ClearBackground(DARKGREEN);
 
 		// Draw isometric tiles
+		BeginMode3D(camera);
 		for (int y = 0; y < MAP_HEIGHT; ++y) {
 			for (int x = 0; x < MAP_WIDTH; ++x) {
 				Vector2 pos = IsoToScreenInt(x, y);
@@ -99,6 +110,7 @@ int main() {
 		Vector2 playerPos = IsoToScreenVector(player.position);
 		DrawCube({ playerPos.x, playerPos.y - TILE_HEIGHT / 2.0f, 0 }, 20, 20, 20, RED);
 		DrawCubeWires({ playerPos.x, playerPos.y - TILE_HEIGHT / 2.0f, 0 }, 20, 20, 20, BLACK);
+		EndMode3D();
 
 		renderDrawingModule(game, drawingModule);
 
