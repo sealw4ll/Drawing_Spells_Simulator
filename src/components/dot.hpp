@@ -1,7 +1,10 @@
 #pragma once
 
+#include <raymath.h>
+#include <vector>
+
 struct Dot {
-	Vector2 position;
+	Vector2 position = {0, 0};
 	bool isHovered = false;
 };
 
@@ -12,7 +15,7 @@ struct DrawingModule {
 	int numDots = 5;
 	bool isVisible = false;
 	Vector2 Position = { 0, 0 };
-	float moduleWidth = 300.0f;
-	float moduleHeight = 300.0f;
+	float moduleWidth = 300;
+	float moduleHeight = 300;
 	float dotRadius = 200.0f;
 };

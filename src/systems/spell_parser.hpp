@@ -4,6 +4,7 @@
 #include <nlohmann/json.hpp>
 #include <iostream>
 
+#include "spell_parser_utils.hpp"
 #include "spell_utils.hpp"
 
 using json = nlohmann::json;

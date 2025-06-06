@@ -68,25 +68,44 @@ std::string levelTypeToString(LevelType level) {
 	}
 }
 
-// utils for checking JSON data
-bool isValidString(const json& j, const std::string& key) {
-	return j.contains(key) && j[key].is_string();
+DamageType getDamageFromRotations(std::bitset<5> pattern) {
+	std::bitset<5> rotated = pattern;
+	for (int i = 0; i < 5; ++i) {
+		auto it = patternToDamageType.find(rotated);
+		if (it != patternToDamageType.end())
+			return it->second;
+
+		// rotate left by 1
+		bool msb = rotated[4];
+		rotated <<= 1;
+		rotated[0] = msb;
+	}
+	return DamageType::NONE;
 }
 
-bool isValidNumber(const json& j, const std::string& key) {
-	return j.contains(key) && j[key].is_number();
+LevelType getLevelFromRotations(std::bitset<5> pattern) {
+	std::bitset<5> rotated = pattern;
+	for (int i = 0; i < 5; ++i) {
+		auto it = patternToLevelType.find(rotated);
+		if (it != patternToLevelType.end()) {
+			return it->second; // return the mapped LevelType
+		}
+
+		// rotate left by 1
+		bool msb = rotated[4];
+		rotated <<= 1;
+		rotated[0] = msb;
+	}
+	return LevelType::NONE;
 }
 
-bool isNonNegative(const json& j, const std::string& key) {
-	return isValidNumber(j, key) && j[key].get<double>() >= 0;
-}
+std::optional<entt::entity> findSpell(GameObjects& game, LevelType level, DamageType damageType) {
+	auto view = game.registry.view<SpellIdentifier>();
+	for (auto [entity, id] : view.each()) {
+		if (id.level == level && id.damageType == damageType) {
+			return entity;
+		}
+	}
 
-bool isValidShape(const json& j) {
-	if (!j.contains("shape") || !j["shape"].is_object()) return false;
-
-	const auto& shape = j["shape"];
-
-	if (!shape.contains("type") || !shape["type"].is_string()) return false;
-	if (!shape.contains("size") || !isNonNegative(shape, "size")) return false;
-	return true;
+	return std::nullopt;
 }
