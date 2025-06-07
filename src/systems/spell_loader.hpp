@@ -9,8 +9,8 @@
 #include <iostream>
 
 #include "../components/spell.hpp"
-#include "spell_parser.hpp"
-#include "spell_utils.hpp"
+#include "helpers/spell_parser.hpp"
+#include "helpers/spell_utils.hpp"
 
 using json = nlohmann::json;
 namespace fs = std::filesystem;

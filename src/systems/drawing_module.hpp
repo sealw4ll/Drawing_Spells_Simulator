@@ -6,7 +6,7 @@
 #include <bitset>
 #include "../components/dot.hpp"
 #include "../components/game_object.hpp"
-#include "spell_utils.hpp"
+#include "helpers/spell_utils.hpp"
 
 void drawingModuleDotsCheck(GameObjects& game, entt::entity& drawingModule);
 void renderDrawingModule(GameObjects& game, entt::entity& drawingModule);

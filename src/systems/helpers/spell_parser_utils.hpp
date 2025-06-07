@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nlohmann/json.hpp>
-#include "../components/spell.hpp"
+#include "../../components/spell.hpp"
 
 using json = nlohmann::json;
 

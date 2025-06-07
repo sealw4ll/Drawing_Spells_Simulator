@@ -3,8 +3,8 @@
 #include <string>
 #include <entt/entt.hpp>
 #include <nlohmann/json.hpp>
-#include "../components/spell.hpp"
-#include "../components/game_object.hpp"
+#include "../../components/spell.hpp"
+#include "../../components/game_object.hpp"
 
 using json = nlohmann::json;
 
