@@ -9,6 +9,8 @@
 #include <bitset>
 #include <utility>
 #include <raymath.h>
+#include <thread>
+#include <chrono>
 
 // component includes
 #include "components/camera.hpp"

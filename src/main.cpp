@@ -28,7 +28,7 @@ static void initGameObjects(GameObjects& game){
 entt::entity initPlayer(GameObjects& game){
 	auto entity = game.registry.create();
 	Player player;
-	player.position = { MAP_WIDTH / 2, MAP_HEIGHT / 2 };
+	player.position = { MAP_WIDTH / 2.0f, MAP_HEIGHT / 2.0f };
 	game.registry.emplace<Player>(entity, std::move(player));
 	return entity;
 }
@@ -101,16 +101,26 @@ void drawPill(Vector2 center, float width, float height, Color color) {
 
 void drawVisibleTiles(GameObjects& game, Camera2D camera) {
 	Vector2 topLeft = GetScreenToWorld2D({ 0, 0 }, camera);
+	Vector2 topRight = GetScreenToWorld2D({ game.screenWidth, 0 }, camera);
+	Vector2 bottomLeft = GetScreenToWorld2D({ 0, game.screenHeight }, camera);
 	Vector2 bottomRight = GetScreenToWorld2D({ game.screenWidth, game.screenHeight }, camera);
 
-	// Convert the corners to isometric tile coordinates
-	Vector2 isoTopLeft = screenToIso(topLeft.x, topLeft.y);
-	Vector2 isoBottomRight = screenToIso(bottomRight.x, bottomRight.y);
+	Vector2 isoTL = screenToIso(topLeft.x, topLeft.y);
+	Vector2 isoTR = screenToIso(topRight.x, topRight.y);
+	Vector2 isoBL = screenToIso(bottomLeft.x, bottomLeft.y);
+	Vector2 isoBR = screenToIso(bottomRight.x, bottomRight.y);
 
-	int minX = static_cast<int>(floor(isoTopLeft.x)) - 2;
-	int maxX = static_cast<int>(ceil(isoBottomRight.x)) + 2;
-	int minY = static_cast<int>(floor(isoTopLeft.y)) - 2;
-	int maxY = static_cast<int>(ceil(isoBottomRight.y)) + 2;
+	// Get overall min/max from all four corners
+	float minXf = fminf(fminf(isoTL.x, isoTR.x), fminf(isoBL.x, isoBR.x));
+	float maxXf = fmaxf(fmaxf(isoTL.x, isoTR.x), fmaxf(isoBL.x, isoBR.x));
+	float minYf = fminf(fminf(isoTL.y, isoTR.y), fminf(isoBL.y, isoBR.y));
+	float maxYf = fmaxf(fmaxf(isoTL.y, isoTR.y), fmaxf(isoBL.y, isoBR.y));
+
+	// Convert to integer tile bounds + padding
+	int minX = (int)floor(minXf) - 2;
+	int maxX = (int)ceil(maxXf) + 2;
+	int minY = (int)floor(minYf) - 2;
+	int maxY = (int)ceil(maxYf) + 2;
 
 	for (int y = minY; y <= maxY; ++y) {
 		for (int x = minX; x <= maxX; ++x) {
@@ -118,6 +128,68 @@ void drawVisibleTiles(GameObjects& game, Camera2D camera) {
 			drawIsoTile(x, y, GRAY);
 		}
 	}
+}
+
+std::optional<Vector2> handleSpellTargeting(GameObjects& game, Camera2D camera, std::optional<entt::entity> spell, entt::entity& drawingModule, Vector2 playerIsoPos) {
+	if (!spell || game.registry.get<DrawingModule>(drawingModule).isVisible == true) return std::nullopt;
+
+	float spellRange = game.registry.get<SpellStats>(*spell).range;
+	//if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+	if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+		Vector2 mouseScreen = GetMousePosition();
+		Vector2 mouseWorld = GetScreenToWorld2D(mouseScreen, camera);
+		Vector2 clickedTile = screenToIso(mouseWorld.x, mouseWorld.y);
+		//std::cout << "clicked: " << clickedTile.x << " | " << clickedTile.y << "\n";
+
+		// Distance in isometric "grid units"
+		Vector2 delta = {
+			clickedTile.x - playerIsoPos.x,
+			clickedTile.y - playerIsoPos.y
+		};
+
+		float distance = sqrtf(delta.x * delta.x + delta.y * delta.y);
+
+		// If in range, return it
+		if (distance <= spellRange) return clickedTile;
+
+		std::cout << "BrUh" << "\n";
+
+		// Otherwise clamp to edge of circle
+		float scale = spellRange / distance;
+
+		Vector2 clamped = {
+			playerIsoPos.x + delta.x * scale,
+			playerIsoPos.y + delta.y * scale
+		};
+
+		return clamped;
+	}
+	return std::nullopt;
+}
+
+void drawSpellRangeCircle(GameObjects &game, Vector2 playerPos, std::optional<entt::entity> spell, Color color) {
+	if (!spell) return;
+
+	float isoRadius = game.registry.get<SpellStats>(*spell).range / 5;
+	const int segments = 64;
+
+	for (int i = 0; i < segments; ++i) {
+		float angle1 = (2 * PI * i) / segments;
+		float angle2 = (2 * PI * (i + 1)) / segments;
+
+		// Point in isometric "circular" radius space
+		float isoX1 = cosf(angle1) * isoRadius;
+		float isoY1 = sinf(angle1) * isoRadius;
+		float isoX2 = cosf(angle2) * isoRadius;
+		float isoY2 = sinf(angle2) * isoRadius;
+
+		// Project those isometric coords into screen space
+		Vector2 p1 = isoToScreen(playerPos.x + isoX1, playerPos.y + isoY1);
+		Vector2 p2 = isoToScreen(playerPos.x + isoX2, playerPos.y + isoY2);
+
+		DrawLineV(p1, p2, color);
+	}
+	DrawCircleV(isoToScreen(playerPos.x, playerPos.y), 5, BLACK);
 }
 
 int main() {
@@ -137,6 +209,7 @@ int main() {
 	entt::entity drawingModule = createDrawingModule(game);
 	std::optional<entt::entity> spellCasted = std::nullopt;
 	while (!WindowShouldClose()) {
+		//std::this_thread::sleep_for(std::chrono::milliseconds(200));
 		// --- Input ---
 		if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) {
 			player.position.x -= 0.1f;
@@ -171,7 +244,6 @@ int main() {
 			toggleDrawingModule(game, drawingModule);
 		}
 
-		drawCastedSpell(game, spellCasted);
 		drawingModuleDotsCheck(game, drawingModule);
 
 		BeginDrawing();
@@ -187,14 +259,23 @@ int main() {
 		BeginMode2D(camera);
 		drawVisibleTiles(game, camera);
 
+		//std::cout << player.position.x << " | " << player.position.y << "\n";
+
 		// Draw player cube
-		Vector2 playerPosIso = isoToScreenVector(player.position);
+		Vector2 playerPosIso = isoToScreen(player.position.x, player.position.y);
 		drawPill(playerPosIso, 16, 24, RED);
 		updateCamera(game, playerPosIso, cameraEntity);
-		//DrawCube({ playerPos.x, playerPos.y - TILE_HEIGHT / 2.0f, 0 }, 20, 20, 20, RED);
-		//DrawCubeWires({ playerPos.x, playerPos.y - TILE_HEIGHT / 2.0f, 0 }, 20, 20, 20, BLACK);
+		drawSpellRangeCircle(game, player.position, spellCasted, BLACK);
+
+		std::optional<Vector2> spellTarget = handleSpellTargeting(game, camera, spellCasted, drawingModule, player.position);
+		if (spellTarget) {
+			std::cout << (*spellTarget).x << " | " << (*spellTarget).y << "\n";
+			//std::cout << player.position.x << " | " << player.position.y << "\n";
+			DrawLineEx(playerPosIso, isoToScreen((*spellTarget).x, (*spellTarget).y), 5.0f, PURPLE);
+		}
 		EndMode2D();
 
+		drawCastedSpell(game, spellCasted);
 		renderDrawingModule(game, drawingModule);
 
 		EndDrawing();

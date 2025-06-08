@@ -36,14 +36,14 @@ enum class LevelType {
 
 struct SpellShape {
 	ShapeType type;
-	double size;
+	float size;
 };
 
 struct SpellStats {
-	double range;
-	double damage;
-	double duration;
-	double castingTime;
+	float range;
+	float damage;
+	float duration;
+	float castingTime;
 };
 
 struct SpellIdentifier {

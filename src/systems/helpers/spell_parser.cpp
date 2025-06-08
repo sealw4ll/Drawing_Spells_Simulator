@@ -47,10 +47,10 @@ std::optional<SpellStats> parseStats(const json& j) {
 	}
 
 	return SpellStats{
-		j["range"].get<double>(),
-		j["damage"].get<double>(),
-		j["duration"].get<double>(),
-		j["casting_time"].get<double>()
+		j["range"].get<float>(),
+		j["damage"].get<float>(),
+		j["duration"].get<float>(),
+		j["casting_time"].get<float>()
 	};
 }
 
@@ -64,6 +64,6 @@ std::optional<SpellShape> parseShape(const json& j) {
 	if (type == ShapeType::NONE) return std::nullopt;
 	return SpellShape{
 		type,
-		shape["size"].get<double>()
+		shape["size"].get<float>()
 	};
 }
