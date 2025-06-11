@@ -8,7 +8,9 @@ const int TILE_HEIGHT = 16;
 const int MAP_WIDTH = 10000;
 const int MAP_HEIGHT = 10000;
 
-void drawCastedSpell(GameObjects& game,std::optional<entt::entity> spellEntity){
+const float MAP_SCALE = 5;
+
+void writeCastedSpell(GameObjects& game,std::optional<entt::entity> spellEntity){
 	std::string s;
 	if (!spellEntity) {
 		DrawText("Spell not found", 10, 10, 20, RED);
@@ -86,18 +88,63 @@ void drawIsoTile(float x, float y, Color color) {
 	DrawLineV(left, top, color);
 }
 
-void drawPill(Vector2 center, float width, float height, Color color) {
+void drawPill(Vector2 center, float width, float height, Color fill, Color outline, float outlineThickness = 3.0f) {
 	float halfW = width / 2.0f;
 	float halfH = height / 2.0f;
+
+	// Draw outline
+	DrawRectangleRounded(
+		{ center.x - halfW - outlineThickness, center.y - halfH - outlineThickness, width + 2 * outlineThickness, height + 2 * outlineThickness },
+		0.5f,
+		16,
+		outline
+	);
 
 	// Center rectangle
 	DrawRectangleRounded(
 		{ center.x - halfW, center.y - halfH, width, height },
-		0.5f,  // Roundness (0.0 to 1.0)
-		16,    // segments
-		color
+		0.5f,
+		16,
+		fill
 	);
 }
+
+//void drawPill(Vector2 isoCenter, float width, float height, Color fill, Color outline, float rotationRadians = 0.0f) {
+//	const int segments = 40;
+//
+//	// Center in screen space
+//	Vector2 center = isoToScreen(isoCenter.x, isoCenter.y);
+//	Vector2 points[segments + 1];
+//
+//	for (int i = 0; i <= segments; ++i) {
+//		float angle = (-2 * PI * i / segments);  // Base angle
+//
+//		// Elliptical shape before rotation
+//		float dx = cosf(angle) * width;
+//		float dy = sinf(angle) * height;
+//
+//		// Convert to screen space first
+//		Vector2 screenPoint = isoToScreen(isoCenter.x + dx, isoCenter.y + dy);
+//
+//		// Rotate around the screen-space center
+//		float rotatedX = (screenPoint.x - center.x) * cosf(rotationRadians) - (screenPoint.y - center.y) * sinf(rotationRadians);
+//		float rotatedY = (screenPoint.x - center.x) * sinf(rotationRadians) + (screenPoint.y - center.y) * cosf(rotationRadians);
+//
+//		// Shift back to original position
+//		points[i] = { center.x + rotatedX, center.y + rotatedY };
+//	}
+//
+//	// Fill using triangle fan
+//	for (int i = 0; i < segments; ++i) {
+//		DrawTriangle(center, points[i], points[i + 1], fill);
+//	}
+//
+//	// Outline
+//	for (int i = 0; i < segments; ++i) {
+//		DrawLineV(points[i], points[i + 1], outline);
+//	}
+//}
+
 
 void drawVisibleTiles(GameObjects& game, Camera2D camera) {
 	Vector2 topLeft = GetScreenToWorld2D({ 0, 0 }, camera);
@@ -134,8 +181,8 @@ std::optional<Vector2> handleSpellTargeting(GameObjects& game, Camera2D camera, 
 	if (!spell || game.registry.get<DrawingModule>(drawingModule).isVisible == true) return std::nullopt;
 
 	float spellRange = game.registry.get<SpellStats>(*spell).range;
-	//if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-	if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+	if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+	//if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
 		Vector2 mouseScreen = GetMousePosition();
 		Vector2 mouseWorld = GetScreenToWorld2D(mouseScreen, camera);
 		Vector2 clickedTile = screenToIso(mouseWorld.x, mouseWorld.y);
@@ -147,12 +194,14 @@ std::optional<Vector2> handleSpellTargeting(GameObjects& game, Camera2D camera, 
 			clickedTile.y - playerIsoPos.y
 		};
 
-		float distance = sqrtf(delta.x * delta.x + delta.y * delta.y);
+		float distance = sqrtf(delta.x * delta.x + delta.y * delta.y) * MAP_SCALE;
 
+
+		std::cout << "distance: " << distance << " | " << "range: " << spellRange << "\n";
+		std::cout << "clicked: " << clickedTile.x << ", " << clickedTile.y << " | " << "playerpos: " << playerIsoPos.x << ", " << playerIsoPos.y << "\n";
 		// If in range, return it
 		if (distance <= spellRange) return clickedTile;
 
-		std::cout << "BrUh" << "\n";
 
 		// Otherwise clamp to edge of circle
 		float scale = spellRange / distance;
@@ -170,7 +219,8 @@ std::optional<Vector2> handleSpellTargeting(GameObjects& game, Camera2D camera, 
 void drawSpellRangeCircle(GameObjects &game, Vector2 playerPos, std::optional<entt::entity> spell, Color color) {
 	if (!spell) return;
 
-	float isoRadius = game.registry.get<SpellStats>(*spell).range / 5;
+	std::cout << "AAAAA" << "\n";
+	float isoRadius = game.registry.get<SpellStats>(*spell).range / MAP_SCALE;
 	const int segments = 64;
 
 	for (int i = 0; i < segments; ++i) {
@@ -192,6 +242,42 @@ void drawSpellRangeCircle(GameObjects &game, Vector2 playerPos, std::optional<en
 	DrawCircleV(isoToScreen(playerPos.x, playerPos.y), 5, BLACK);
 }
 
+
+void drawSpells(GameObjects& game) {
+	auto spellView = game.registry.view<Spell, SpellShape, SpellStats>();
+
+	for (auto entity : spellView) {
+		auto& spell = game.registry.get<Spell>(entity);
+		auto& shape = game.registry.get<SpellShape>(entity);
+		auto& stats = game.registry.get<SpellStats>(entity);
+
+		Vector2 screenPos = isoToScreen(spell.position.x, spell.position.y);
+
+		switch (shape.type) {
+		case ShapeType::CIRCLE:
+			DrawCircleV(screenPos, shape.size * MAP_SCALE, RED);
+			break;
+		case ShapeType::SQUARE:
+			DrawRectangleV({ screenPos.x - shape.size, screenPos.y - shape.size }, { shape.size * 2, shape.size * 2 }, RED);
+			break;
+		case ShapeType::CONE:
+			DrawTriangle({ screenPos.x, screenPos.y }, { screenPos.x + shape.size, screenPos.y - shape.size }, { screenPos.x - shape.size, screenPos.y - shape.size }, RED);
+			break;
+		case ShapeType::LINE:
+			DrawLineEx(screenPos, { screenPos.x + shape.size, screenPos.y }, 5, RED);
+			break;
+		default:
+			break;
+		}
+
+		// Handle spell expiration
+		if (--stats.duration <= 0) {
+			game.registry.destroy(entity);
+		}
+	}
+}
+
+
 int main() {
 	GameObjects game;
 
@@ -208,6 +294,10 @@ int main() {
 	entt::entity cameraEntity = initCamera(game, player);
 	entt::entity drawingModule = createDrawingModule(game);
 	std::optional<entt::entity> spellCasted = std::nullopt;
+
+	std::optional<Vector2> spellTarget;
+	std::optional <entt::entity> activeSpell = std::nullopt; // Ensure only one spell at a time
+	//std::vector<entt::entity> activeSpells;
 	while (!WindowShouldClose()) {
 		//std::this_thread::sleep_for(std::chrono::milliseconds(200));
 		// --- Input ---
@@ -241,7 +331,10 @@ int main() {
 		// Release to close drawing module and cast spell
 		if (IsKeyReleased(KEY_LEFT_CONTROL)) {
 			spellCasted = printAndResetConnections(game, drawingModule);
+			if (spellCasted)
+				std::cout << "what" << "\n";
 			toggleDrawingModule(game, drawingModule);
+			spellTarget.reset();
 		}
 
 		drawingModuleDotsCheck(game, drawingModule);
@@ -249,33 +342,37 @@ int main() {
 		BeginDrawing();
 		ClearBackground(DARKGREEN);
 
-		// Draw isometric tiles
-		//for (int y = 0; y < MAP_HEIGHT; ++y) {
-		//	for (int x = 0; x < MAP_WIDTH; ++x) {
-		//		DrawIsoTile(x, y, GRAY);
-		//	}
-		//}
 		auto& camera = game.registry.get<CameraObject>(cameraEntity).camera;
 		BeginMode2D(camera);
 		drawVisibleTiles(game, camera);
 
-		//std::cout << player.position.x << " | " << player.position.y << "\n";
-
 		// Draw player cube
 		Vector2 playerPosIso = isoToScreen(player.position.x, player.position.y);
-		drawPill(playerPosIso, 16, 24, RED);
 		updateCamera(game, playerPosIso, cameraEntity);
 		drawSpellRangeCircle(game, player.position, spellCasted, BLACK);
 
 		std::optional<Vector2> spellTarget = handleSpellTargeting(game, camera, spellCasted, drawingModule, player.position);
 		if (spellTarget) {
-			std::cout << (*spellTarget).x << " | " << (*spellTarget).y << "\n";
-			//std::cout << player.position.x << " | " << player.position.y << "\n";
-			DrawLineEx(playerPosIso, isoToScreen((*spellTarget).x, (*spellTarget).y), 5.0f, PURPLE);
+			if (activeSpell) {
+				game.registry.destroy(*activeSpell);
+				activeSpell.reset();
+			}
+
+			// Create new spell entity
+			entt::entity spellEntity = game.registry.create();
+			game.registry.emplace<Spell>(spellEntity, game.registry.get<Spell>(*spellCasted)); // Copy spell data
+			game.registry.emplace<SpellStats>(spellEntity, game.registry.get<SpellStats>(*spellCasted));
+			game.registry.emplace<SpellShape>(spellEntity, game.registry.get<SpellShape>(*spellCasted));
+			game.registry.get<Spell>(spellEntity).position = *spellTarget; // Assign position
+
+			activeSpell = spellEntity;
 		}
+		//drawVerticalIsometricPill(player.position, 0.5, 1, RED, BLACK);
+		drawPill(playerPosIso, 16, 24, RED, BLACK);
 		EndMode2D();
 
-		drawCastedSpell(game, spellCasted);
+		drawSpells(game);
+		writeCastedSpell(game, spellCasted);
 		renderDrawingModule(game, drawingModule);
 
 		EndDrawing();

@@ -49,7 +49,7 @@ std::optional<SpellStats> parseStats(const json& j) {
 	return SpellStats{
 		j["range"].get<float>(),
 		j["damage"].get<float>(),
-		j["duration"].get<float>(),
+		j["duration"].get<float>() ? j["duration"].get<float>() * 30: 30,
 		j["casting_time"].get<float>()
 	};
 }
