@@ -6,7 +6,7 @@
     "damage": 8,
     "shape": {
         "type": "square",
-        "size": 15
+        "size": 30
     },
     "duration": 0,
     "casting_time": 1

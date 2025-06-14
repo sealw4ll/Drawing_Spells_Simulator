@@ -1,0 +1,13 @@
+{
+    "name": "cone of cold",
+    "level": 5,
+    "damage_type": "ice",
+    "range": 60,
+    "damage": 36,
+    "shape": {
+        "type": "cone",
+        "size": 60
+    },
+    "duration": 0,
+    "casting_time": 5
+}

@@ -1,15 +1,5 @@
 ﻿#include "main.hpp"
 
-// Tile size
-const int TILE_WIDTH = 32;
-const int TILE_HEIGHT = 16;
-
-// Grid size
-const int MAP_WIDTH = 10000;
-const int MAP_HEIGHT = 10000;
-
-const float MAP_SCALE = 5;
-
 void writeCastedSpell(GameObjects& game,std::optional<entt::entity> spellEntity){
 	std::string s;
 	if (!spellEntity) {
@@ -35,25 +25,19 @@ entt::entity initPlayer(GameObjects& game){
 	return entity;
 }
 
-Vector2 isoToScreenVector(Vector2 pos) {
-	return {
-		(pos.x - pos.y) * TILE_WIDTH / 2 + 400,
-		(pos.x + pos.y) * TILE_HEIGHT / 2 + 100
-	};
-}
+//Vector2 isoToScreenVector(Vector2 pos) {
+//	return {
+//		(pos.x - pos.y) * TILE_WIDTH / 2 + 400,
+//		(pos.x + pos.y) * TILE_HEIGHT / 2 + 100
+//	};
+//}
 
-Vector2 screenToIso(float screenX, float screenY) {
-	float x = (screenY / (TILE_HEIGHT / 2) + screenX / (TILE_WIDTH / 2)) / 2.0f;
-	float y = (screenY / (TILE_HEIGHT / 2) - screenX / (TILE_WIDTH / 2)) / 2.0f;
-	return { x, y };
-}
-
-Vector2 isoToScreenInt(int x, int y) {
-	return {
-		static_cast<float>((x - y) * TILE_WIDTH / 2 + 400),
-		static_cast<float>((x + y) * TILE_HEIGHT / 2 + 100)
-	};
-}
+//Vector2 isoToScreenInt(int x, int y) {
+//	return {
+//		static_cast<float>((x - y) * TILE_WIDTH / 2 + 400),
+//		static_cast<float>((x + y) * TILE_HEIGHT / 2 + 100)
+//	};
+//}
 
 entt::entity initCamera(GameObjects& game, Player player) {
 	CameraObject module;
@@ -66,26 +50,6 @@ entt::entity initCamera(GameObjects& game, Player player) {
 	auto entity = game.registry.create();
 	game.registry.emplace<CameraObject>(entity, std::move(module));
 	return entity;
-}
-
-Vector2 isoToScreen(float x, float y) {
-	return {
-		(x - y) * TILE_WIDTH / 2.0f,
-		(x + y) * TILE_HEIGHT / 2.0f
-	};
-}
-
-void drawIsoTile(float x, float y, Color color) {
-	Vector2 center = isoToScreen(x, y);
-	Vector2 top = { center.x, center.y - TILE_HEIGHT / 2.0f };
-	Vector2 right = { center.x + TILE_WIDTH / 2.0f, center.y };
-	Vector2 bottom = { center.x, center.y + TILE_HEIGHT / 2.0f };
-	Vector2 left = { center.x - TILE_WIDTH / 2.0f, center.y };
-
-	DrawLineV(top, right, color);
-	DrawLineV(right, bottom, color);
-	DrawLineV(bottom, left, color);
-	DrawLineV(left, top, color);
 }
 
 void drawPill(Vector2 center, float width, float height, Color fill, Color outline, float outlineThickness = 3.0f) {
@@ -139,139 +103,6 @@ void drawVisibleTiles(GameObjects& game, Camera2D camera) {
 		}
 	}
 }
-
-std::optional<Vector2> handleSpellTargeting(GameObjects& game, Camera2D camera, std::optional<entt::entity> spell, entt::entity& drawingModule, Vector2 playerIsoPos) {
-	if (!spell || game.registry.get<DrawingModule>(drawingModule).isVisible == true) return std::nullopt;
-
-	float spellRange = game.registry.get<SpellStats>(*spell).range;
-	if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-		Vector2 mouseScreen = GetMousePosition();
-		Vector2 mouseWorld = GetScreenToWorld2D(mouseScreen, camera);
-		Vector2 clickedTile = screenToIso(mouseWorld.x, mouseWorld.y);
-
-		// Distance in isometric "grid units"
-		Vector2 delta = {
-			clickedTile.x - playerIsoPos.x,
-			clickedTile.y - playerIsoPos.y
-		};
-
-		float distance = sqrtf(delta.x * delta.x + delta.y * delta.y) * MAP_SCALE;
-
-		// If in range, return it
-		if (distance <= spellRange) return clickedTile;
-
-
-		// Otherwise clamp to edge of circle
-		float scale = spellRange / distance;
-
-		Vector2 clamped = {
-			playerIsoPos.x + delta.x * scale,
-			playerIsoPos.y + delta.y * scale
-		};
-
-		return clamped;
-	}
-	return std::nullopt;
-}
-
-void drawIsoCircle(Vector2 center, float radius, Color color, const bool fill = true) {
-	//const int segments = 64;
-
-	//for (int i = 0; i < segments; ++i) {
-	//	float angle1 = (2 * PI * i) / segments;
-	//	float angle2 = (2 * PI * (i + 1)) / segments;
-
-	//	// Point in isometric "circular" radius space
-	//	float isoX1 = cosf(angle1) * radius;
-	//	float isoY1 = sinf(angle1) * radius;
-	//	float isoX2 = cosf(angle2) * radius;
-	//	float isoY2 = sinf(angle2) * radius;
-
-	//	// Project those isometric coords into screen space
-	//	Vector2 p1 = isoToScreen(center.x + isoX1, center.y + isoY1);
-	//	Vector2 p2 = isoToScreen(center.x + isoX2, center.y + isoY2);
-
-	//	DrawLineV(p1, p2, color);
-	//}
-	const int segments = 64;
-	Vector2 screenCenter = isoToScreen(center.x, center.y);
-	Vector2 points[segments];
-
-	// Compute isometric circle points
-	for (int i = 0; i < segments; ++i) {
-		float angle = (2 * PI * i) / segments;
-		float isoX = cosf(angle) * radius;
-		float isoY = sinf(angle) * radius;
-
-		points[i] = isoToScreen(center.x + isoX, center.y + isoY);
-	}
-
-	// Fill the circle using a triangle fan if fill is true
-	if (fill) {
-		for (int i = 0; i < segments - 1; ++i) {
-			DrawTriangle(points[i + 1], points[i], screenCenter, color);
-		}
-		// Final triangle to close the circle
-		DrawTriangle(points[0], points[segments - 1], screenCenter, color);
-	}
-
-	// Draw the circle outline
-	for (int i = 0; i < segments - 1; ++i) {
-		DrawLineV(points[i], points[i + 1], color);
-	}
-	DrawLineV(points[segments - 1], points[0], color);
-}
-
-void drawSpellRangeCircle(GameObjects &game, Vector2 playerPos, std::optional<entt::entity> spell, Color color) {
-	if (!spell) return;
-
-	float isoRadius = game.registry.get<SpellStats>(*spell).range / MAP_SCALE;
-	drawIsoCircle(playerPos, isoRadius, color, false);
-	DrawCircleV(isoToScreen(playerPos.x, playerPos.y), 5, BLACK);
-}
-
-
-void drawSpells(GameObjects& game, Vector2 playerPosScreen) {
-	auto spellView = game.registry.view<Spell, SpellShape, SpellStats, SpellActiveComponent, SpellIdentifier>();
-
-	for (auto entity : spellView) {
-		auto& spell = game.registry.get<Spell>(entity);
-		auto& shape = game.registry.get<SpellShape>(entity);
-		auto& stats = game.registry.get<SpellStats>(entity);
-		auto& identifier = game.registry.get<SpellIdentifier>(entity);
-		auto& activeComponent = game.registry.get<SpellActiveComponent>(entity);
-
-		Vector2 spellScreenPos = isoToScreen(activeComponent.position.x, activeComponent.position.y);
-
-		std::cout << "position: " << spellScreenPos.x << " | " << spellScreenPos.y << "\n";
-
-		switch (shape.type) {
-			case ShapeType::CIRCLE:
-				drawIsoCircle(activeComponent.position, shape.size / MAP_SCALE, damageTypeToColor(identifier.damageType));
-				break;
-			case ShapeType::TARGET:
-				drawIsoCircle(activeComponent.position, 1, damageTypeToColor(identifier.damageType));
-				break;
-			case ShapeType::SQUARE:
-				DrawRectangleV({ spellScreenPos.x - shape.size, spellScreenPos.y - shape.size }, { shape.size * 2, shape.size * 2 }, damageTypeToColor(identifier.damageType));
-				break;
-			case ShapeType::CONE:
-				DrawTriangle({ spellScreenPos.x, spellScreenPos.y }, { spellScreenPos.x + shape.size, spellScreenPos.y - shape.size }, { spellScreenPos.x - shape.size, spellScreenPos.y - shape.size }, damageTypeToColor(identifier.damageType));
-				break;
-			case ShapeType::LINE:
-				DrawLineEx(isoToScreen(activeComponent.positionCasted.x, activeComponent.positionCasted.y), { spellScreenPos.x + shape.size, spellScreenPos.y }, shape.size * MAP_SCALE, damageTypeToColor(identifier.damageType));
-				break;
-			default:
-				break;
-		}
-
-		 //Handle spell expiration
-		if (--activeComponent.lifeTime <= 0) {
-			game.registry.remove<SpellActiveComponent>(entity);
-		}
-	}
-}
-
 
 int main() {
 	GameObjects game;
@@ -342,6 +173,7 @@ int main() {
 		// Draw player cube
 		Vector2 playerPosIso = isoToScreen(player.position.x, player.position.y);
 		updateCamera(game, playerPosIso, cameraEntity);
+		//drawPill(playerPosIso, 16, 24, RED, BLACK);
 		drawSpellRangeCircle(game, player.position, spellCasted, BLACK);
 
 		std::optional<Vector2> spellTarget = handleSpellTargeting(game, camera, spellCasted, drawingModule, player.position);

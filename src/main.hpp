@@ -11,6 +11,9 @@
 #include <thread>
 #include <chrono>
 
+// config
+#include "config.hpp"
+
 // component includes
 #include "components/camera.hpp"
 #include "components/dot.hpp"
@@ -22,3 +25,4 @@
 #include "systems/spell_loader.hpp"
 #include "systems/drawing_module.hpp"
 #include "systems/camera_system.hpp"
+#include "systems/spell_system.hpp"
