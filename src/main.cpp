@@ -183,13 +183,6 @@ int main() {
 				activeSpell.reset();
 			}
 
-			 //Create new spell entity
-			/*entt::entity spellEntity = game.registry.create();
-			game.registry.emplace<Spell>(spellEntity, game.registry.get<Spell>(*spellCasted));
-			game.registry.emplace<SpellStats>(spellEntity, game.registry.get<SpellStats>(*spellCasted));
-			game.registry.emplace<SpellShape>(spellEntity, game.registry.get<SpellShape>(*spellCasted));
-			game.registry.emplace<SpellIdentifier>(spellEntity, game.registry.get<SpellIdentifier>(*spellCasted));*/
-
 			SpellActiveComponent module;
 			module.position = *spellTarget;
 			module.positionCasted = player.position;
