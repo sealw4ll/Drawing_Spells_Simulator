@@ -1,6 +1,7 @@
 #pragma once
 
 #include <raylib.h>
+#define RAYMATH_IMPLEMENTATION
 #include <raymath.h>
 #include <entt/entt.hpp>
 #include "../components/camera.hpp"

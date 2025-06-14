@@ -1,8 +1,8 @@
 #pragma once
 
+#include <raylib.h>
 #include <optional>
 #include <entt/entt.hpp>
-#include <raylib.h>
 #include <bitset>
 #include "../components/dot.hpp"
 #include "../components/game_object.hpp"

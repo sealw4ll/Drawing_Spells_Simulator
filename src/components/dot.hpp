@@ -1,6 +1,6 @@
 #pragma once
 
-#include <raymath.h>
+#include <raylib.h>
 #include <vector>
 
 struct Dot {

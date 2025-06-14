@@ -1,4 +1,5 @@
 #include "drawing_module.hpp"
+#include <raymath.h>
 
 static bool isMouseOverDot(Vector2 mouse, Vector2 dotPos, double radius = 20.0f) {
 	return Vector2Distance(mouse, dotPos) <= radius;

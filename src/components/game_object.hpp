@@ -1,7 +1,7 @@
 #pragma once
 
 #include <entt/entt.hpp>
-#include <raymath.h>
+#include <raylib.h>
 
 struct GameObjects {
 	Vector2 mouse = { 0, 0 };

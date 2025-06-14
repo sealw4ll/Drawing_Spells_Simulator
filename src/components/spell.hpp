@@ -3,7 +3,7 @@
 #include <string>
 #include <bitset>
 #include <unordered_map>
-#include <raymath.h>
+#include <raylib.h>
 
 enum class DamageType {
 	NONE,
@@ -54,6 +54,12 @@ struct SpellIdentifier {
 struct Spell {
 	std::string name;
 	Vector2 position {0, 0};
+};
+
+struct SpellActiveComponent {
+	float lifeTime;
+	Vector2 position{ 0, 0 };
+	Vector2 positionCasted{ 0, 0 };
 };
 
 const std::unordered_map<std::bitset<5>, DamageType> patternToDamageType = {

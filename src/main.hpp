@@ -1,14 +1,13 @@
 ﻿#pragma once
 
 // lib includes
-#include <iostream>
 #include <raylib.h>
+#include <iostream>
 #include <entt/entt.hpp>
 #include <vector>
 #include <cmath>
 #include <bitset>
 #include <utility>
-#include <raymath.h>
 #include <thread>
 #include <chrono>
 

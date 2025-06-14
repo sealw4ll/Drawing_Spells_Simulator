@@ -1,6 +1,6 @@
 {
     "name": "lightning bolt",
-    "level": 2,
+    "level": 3,
     "damage_type": "lightning",
     "range": 100,
     "damage": 24,

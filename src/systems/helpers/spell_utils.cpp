@@ -1,5 +1,7 @@
 #include "spell_utils.hpp"
 
+// DAMAGE HELPERS
+
 // Function to parse the damage type from a string
 DamageType parseDamageType(const std::string& str) {
 	if (str == "fire") return DamageType::FIRE;
@@ -9,6 +11,19 @@ DamageType parseDamageType(const std::string& str) {
 	if (str == "psychic") return DamageType::PSYCHIC;
 	if (str == "force") return DamageType::FORCE;
 	return DamageType::NONE;
+}
+
+// Function to convert a DamageType enum to a string
+std::string damageTypeToString(DamageType type) {
+	switch (type) {
+	case DamageType::FIRE: return "fire damage";
+	case DamageType::THUNDER: return "thunder damage";
+	case DamageType::ICE: return "ice damage";
+	case DamageType::LIGHTNING: return "lightning damage";
+	case DamageType::PSYCHIC: return "psychic damage";
+	case DamageType::FORCE: return "force damage";
+	default: return "none";
+	}
 }
 
 // Function to parse the level type from a int
@@ -21,6 +36,22 @@ LevelType parseDamageType(const int level) {
 	if (level == 5) return LevelType::LEVEL5;
 	return LevelType::NONE;
 }
+
+// Function to get color from damage type
+Color damageTypeToColor(DamageType type) {
+	switch (type) {
+	case DamageType::FIRE: return RED;
+	case DamageType::THUNDER: return YELLOW;
+	case DamageType::ICE: return SKYBLUE;
+	case DamageType::LIGHTNING: return DARKBLUE;
+	case DamageType::PSYCHIC: return VIOLET;
+	case DamageType::FORCE: return LIGHTGRAY;
+	case DamageType::NONE: return BLACK;
+	default: return BLACK;
+	}
+}
+
+// SHAPE HELPERS
 
 // Function to parse the shape type from a string
 ShapeType parseShapeType(const std::string& str) {
@@ -44,17 +75,7 @@ std::string shapeTypeToString(ShapeType type) {
 	}
 }
 
-// Function to convert a DamageType enum to a string
-std::string damageTypeToString(DamageType type) {
-	switch (type) {
-	case DamageType::FIRE: return "fire damage";
-	case DamageType::THUNDER: return "thunder damage";
-	case DamageType::ICE: return "ice damage";
-	case DamageType::LIGHTNING: return "lightning damage";
-	case DamageType::PSYCHIC: return "psychic damage";
-	default: return "none";
-	}
-}
+// LEVEL HELPERS
 
 std::string levelTypeToString(LevelType level) {
 	switch (level) {
@@ -67,6 +88,8 @@ std::string levelTypeToString(LevelType level) {
 	default: return "Invalid spell";
 	}
 }
+
+// ROTATION FUNCTIONS
 
 DamageType getDamageFromRotations(std::bitset<5> pattern) {
 	std::bitset<5> rotated = pattern;
@@ -99,6 +122,8 @@ LevelType getLevelFromRotations(std::bitset<5> pattern) {
 	return LevelType::NONE;
 }
 
+
+//find spell helper
 std::optional<entt::entity> findSpell(GameObjects& game, LevelType level, DamageType damageType) {
 	auto view = game.registry.view<SpellIdentifier>();
 	for (auto [entity, id] : view.each()) {
