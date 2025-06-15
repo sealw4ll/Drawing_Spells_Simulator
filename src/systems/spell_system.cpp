@@ -1,5 +1,7 @@
 #include "spell_system.hpp"
 
+
+// DRAWING
 void hitEnemy(GameObjects &game, SpellActiveComponent& activeComponent, SpellShape& shape, SpellStats& stats) {
 	if (activeComponent.hit == true) return ;
 	auto enemyView = game.registry.view<Enemy, EnemyActiveComponent>();
@@ -151,6 +153,21 @@ void drawIsoTriangle(Vector2 start, Vector2 end, float size, Color color) {
 	DrawTriangle(screenStart, screenV2, screenV3, color);
 }
 
+void writeCastedSpell(GameObjects& game, std::optional<entt::entity> spellEntity) {
+	std::string s;
+	if (!spellEntity) {
+		DrawText("Spell not found (Hold left ctrl to cast spells)", 10, 10, 20, RED);
+		return;
+	}
+	auto activeSpellEntity = game.registry.view<SpellActiveComponent>();
+	auto& spellInfo = game.registry.get<Spell>(*spellEntity);
+	s = "Click to cast: " + spellInfo.name;
+	DrawText(s.c_str(), 10, 10, 20, BLACK);
+}
+
+
+// LOGIC
+
 std::optional<Vector2> handleSpellTargeting(GameObjects& game, Camera2D camera, std::optional<entt::entity> spell, entt::entity& drawingModule, Vector2 playerIsoPos) {
 	if (!spell || game.registry.get<DrawingModule>(drawingModule).isVisible == true) return std::nullopt;
 
@@ -183,4 +200,21 @@ std::optional<Vector2> handleSpellTargeting(GameObjects& game, Camera2D camera, 
 		return clamped;
 	}
 	return std::nullopt;
+}
+
+void activeSpellHandler(GameObjects& game, std::optional<entt::entity>& activeSpell, std::optional<Vector2>& spellTarget, std::optional<entt::entity>& spellCasted, Vector2 playerPos) {
+	if (activeSpell) {
+		game.registry.remove<SpellActiveComponent>(*activeSpell);
+		activeSpell.reset();
+	}
+
+	SpellActiveComponent module;
+	module.position = *spellTarget;
+	module.positionCasted = playerPos;
+	module.lifeTime = game.registry.get<SpellStats>(*spellCasted).duration;
+	game.registry.emplace<SpellActiveComponent>(*spellCasted, std::move(module));
+
+	activeSpell = *spellCasted;
+	spellTarget = std::nullopt;
+	spellCasted = std::nullopt;
 }
