@@ -49,7 +49,7 @@ void renderDrawingModule(GameObjects& game, entt::entity& drawingModule) {
 	if (module.isVisible == false) return;
 	// Draw connections
 	for (auto& c : module.connections) {
-		DrawLineEx(module.dots[c.first].position, module.dots[c.second].position, 5.0f, DARKGRAY);
+		DrawLineEx(module.dots[c.first].position, module.dots[c.second].position, 5.0f, WHITE);
 	}
 
 	// Draw dragging line

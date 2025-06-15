@@ -3,11 +3,11 @@
     "level": 5,
     "damage_type": "psychic",
     "range": 60,
-    "damage": 3,
+    "damage": 40,
     "shape": {
         "type": "target",
         "size": 1
     },
-    "duration": 10,
+    "duration": 0,
     "casting_time": 5
 }
