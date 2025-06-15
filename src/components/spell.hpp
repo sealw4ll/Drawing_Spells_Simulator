@@ -60,6 +60,7 @@ struct SpellActiveComponent {
 	float lifeTime;
 	Vector2 position{ 0, 0 };
 	Vector2 positionCasted{ 0, 0 };
+	bool hit = false;
 };
 
 const std::unordered_map<std::bitset<5>, DamageType> patternToDamageType = {

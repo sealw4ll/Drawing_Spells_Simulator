@@ -20,9 +20,12 @@
 #include "components/game_object.hpp"
 #include "components/player.hpp"
 #include "components/spell.hpp"
+#include "components/enemy.hpp"
 
 // systems includes
 #include "systems/spell_loader.hpp"
 #include "systems/drawing_module.hpp"
 #include "systems/camera_system.hpp"
 #include "systems/spell_system.hpp"
+#include "systems/player_system.hpp"
+#include "systems/enemy_system.hpp"

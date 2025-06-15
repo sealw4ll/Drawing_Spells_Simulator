@@ -1,5 +1,47 @@
 #include "spell_system.hpp"
 
+void hitEnemy(GameObjects &game, SpellActiveComponent& activeComponent, SpellShape& shape, SpellStats& stats) {
+	if (activeComponent.hit == true) return ;
+	auto enemyView = game.registry.view<Enemy, EnemyActiveComponent>();
+	for (auto enemyEntity : enemyView) {
+		auto& enemy = game.registry.get<Enemy>(enemyEntity);
+		auto& enemyActive = game.registry.get<EnemyActiveComponent>(enemyEntity);
+
+		Vector2 enemyPos = enemy.position;
+
+		bool hit = false;
+
+		switch (shape.type) {
+		case ShapeType::CIRCLE:
+			hit = isPointInCircle(enemyPos, activeComponent.position, shape.size / MAP_SCALE);
+			break;
+		case ShapeType::TARGET:
+			hit = isPointInCircle(enemyPos, activeComponent.position, 5 / MAP_SCALE);
+			break;
+		case ShapeType::SQUARE:
+			hit = isPointInRectangle(enemyPos, activeComponent.position, shape.size / MAP_SCALE, shape.size / MAP_SCALE);
+			break;
+		case ShapeType::LINE:
+			hit = isPointNearLine(enemyPos, activeComponent.positionCasted, activeComponent.position, shape.size / MAP_SCALE);
+			break;
+		case ShapeType::CONE:
+			hit = isPointInTriangle(enemyPos, activeComponent.positionCasted, activeComponent.position, shape.size / MAP_SCALE);
+			break;
+		}
+
+		if (hit) {
+			activeComponent.hit = true;
+			// Apply damage
+			enemyActive.currentHp -= stats.damage;
+
+			// Remove enemy if dead
+			if (enemyActive.currentHp <= 0) {
+				game.registry.destroy(enemyEntity);
+			}
+		}
+	}
+}
+
 void drawSpells(GameObjects& game, Vector2 playerPosScreen) {
 	auto spellView = game.registry.view<Spell, SpellShape, SpellStats, SpellActiveComponent, SpellIdentifier>();
 
@@ -31,6 +73,8 @@ void drawSpells(GameObjects& game, Vector2 playerPosScreen) {
 		default:
 			break;
 		}
+
+		hitEnemy(game, activeComponent, shape, stats);
 
 		//Handle spell expiration
 		if (--activeComponent.lifeTime <= 0) {
@@ -99,43 +143,9 @@ void drawIsoLine(Vector2 start, Vector2 end, float thickness, Color color) {
 }
 
 void drawIsoTriangle(Vector2 start, Vector2 end, float size, Color color) {
-	// Convert isometric coordinates to screen space
-	Vector2 screenStart = isoToScreen(start.x, start.y);
 
-	// Direction vector in isometric space
-	Vector2 dir = { end.x - start.x, end.y - start.y };
-	float length = sqrtf(dir.x * dir.x + dir.y * dir.y);
-	if (length == 0) return; // Avoid divide by zero
-
-	// Normalize direction vector
-	dir.x /= length;
-	dir.y /= length;
-
-	// Calculate the isometric point at the tip of the triangle (height = size)
-	Vector2 isoTip = {
-		start.x + dir.x * size,
-		start.y + dir.y * size
-	};
-	Vector2 screenTip = isoToScreen(isoTip.x, isoTip.y);
-
-	// Perpendicular vector for base (rotated 90°)
-	Vector2 perp = { -dir.y, dir.x };
-
-	// Base half-width
-	float halfWidth = size / 2.0f;
-
-	// Points for base of the triangle in isometric space
-	Vector2 isoV2 = {
-		isoTip.x + perp.x * halfWidth,
-		isoTip.y + perp.y * halfWidth
-	};
-	Vector2 isoV3 = {
-		isoTip.x - perp.x * halfWidth,
-		isoTip.y - perp.y * halfWidth
-	};
-
-	Vector2 screenV2 = isoToScreen(isoV2.x, isoV2.y);
-	Vector2 screenV3 = isoToScreen(isoV3.x, isoV3.y);
+	std::tuple<Vector2, Vector2, Vector2> trianglePoints = getIsoTrianglePoints(start, end, size);
+	auto [screenStart, screenV2, screenV3] = trianglePoints;
 
 	// Draw filled triangle
 	DrawTriangle(screenStart, screenV2, screenV3, color);
