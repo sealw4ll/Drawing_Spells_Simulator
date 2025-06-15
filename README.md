@@ -1,14 +1,40 @@
 # Drawing_Spells_Simulator
+## installation
+Using Visual Studio 2022
+1. clone and open Visual Studio 2022
+2. vcpkg install
+3. build all
+4. run game
 
-casting Fire bolt
-![image](https://github.com/user-attachments/assets/f9fc5e74-90f2-448f-a024-e1b9131bd946)
+Using cmd
+1. clone repo
+2. vcpkg install
+3. ```cmake -DCMAKE_TOOLCHAIN_FILE=<path_to_vcpkg>/scripts/buildsystems/vcpkg.cmake ..```
+4. ```cmake -B build .```
+5. ```cmake --build build --config Release```
+6. ```./build/Drawing_Spells_Simulator```
 
-casting Ice Storm
-![image](https://github.com/user-attachments/assets/f6c3203b-5c4b-4bdf-90f7-e0a5ea3e1537)
+# How to Cast Spells
+Casting Fire Bolt
+![image](https://github.com/user-attachments/assets/fa2bcac4-5df1-4984-9ea5-c25e46847a53)
 
-TODO:
-- clean up code
-- buttons for drawing module
-- player & enemy enetity
-- fix bit mapping and rotation
-- spellcasting functionality
+Casting Thunderwave
+![image](https://github.com/user-attachments/assets/13e211f0-b478-4890-b13d-ae8123d4d3b5)
+
+Casting Shatter
+![image](https://github.com/user-attachments/assets/1186ab06-88d2-49e1-a1ff-a0afd0f71158)
+
+Casting Fireball
+![image](https://github.com/user-attachments/assets/4bc89525-b405-4ac5-975c-981d120a6013)
+
+Casting Lightning Bolt
+![image](https://github.com/user-attachments/assets/62d40643-2c31-4316-b0ec-189c6e2c1158)
+
+Casting Ice Storm
+![image](https://github.com/user-attachments/assets/0aca2967-26e3-415c-bdaa-d1cc8f640ad9)
+
+Casting Cone Of Cold
+![image](https://github.com/user-attachments/assets/21043519-4749-46ce-bcf7-9462bcf00f23)
+
+Casting Telekinesis 
+![image](https://github.com/user-attachments/assets/87c0a7c8-be78-4d1e-958b-a1f01827f829)
