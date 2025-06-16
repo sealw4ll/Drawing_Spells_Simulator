@@ -15,6 +15,11 @@ Using cmd
 6. ```./build/Drawing_Spells_Simulator```
 
 # How to Cast Spells
+Levels are casted based on 2 identifiers
+1. spell level
+2. damage type
+
+You can add spells in the spells folder as a json file. The program will automatically parse it. Any errors found the spell just wont be present in the game. 
 
 ## cantrip spells
 Casting Fire Bolt
