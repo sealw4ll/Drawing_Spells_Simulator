@@ -3,7 +3,7 @@
 #include <raylib.h>
 #include <entt/entt.hpp>
 
-#include "../config.hpp";
+#include "../config.hpp"
 #include "../components/enemy.hpp"
 #include "../components/player.hpp"
 #include "../components/game_object.hpp"

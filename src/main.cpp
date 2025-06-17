@@ -1,5 +1,22 @@
 ﻿#include "main.hpp"
 
+static void loadSpellsSmart(entt::registry& registry) {
+	namespace fs = std::filesystem;
+
+	std::string devPath = "../spells/";
+	std::string distPath = "./spells/";
+
+	if (fs::exists(devPath)) {
+		loadSpells(registry, devPath);
+	}
+	else if (fs::exists(distPath)) {
+		loadSpells(registry, distPath);
+	}
+	else {
+		std::cerr << "Error: Could not find spells folder.\n";
+	}
+}
+
 int main() {
 	GameObjects game;
 
@@ -10,7 +27,7 @@ int main() {
 	SetTargetFPS(60);
 
 	// load spells
-	loadSpells(game.registry, "../spells/");
+	loadSpellsSmart(game.registry);
 
 	// init player
 	entt::entity playerEntity = initPlayer(game);
