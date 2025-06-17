@@ -1,5 +1,11 @@
 # Drawing_Spells_Simulator
-## installation
+## installation (Install and Play)
+1. Install latest release
+2. Unzip
+3. Run 'Drawing_Spells_Simulator.exe'
+4. Have fun!
+
+## installation (For the code snoopers)
 Using Visual Studio 2022
 1. clone and open Visual Studio 2022
 2. vcpkg install
