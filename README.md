@@ -8,21 +8,6 @@ https://github.com/user-attachments/assets/b19dd7b3-3d37-4ec6-b1ee-2c96851a5138
 3. Run 'Drawing_Spells_Simulator.exe'
 4. Have fun!
 
-## installation (For the code snoopers)
-Using Visual Studio 2022
-1. clone and open Visual Studio 2022
-2. vcpkg install
-3. build all
-4. run game
-
-Using cmd
-1. clone repo
-2. vcpkg install
-3. ```cmake -DCMAKE_TOOLCHAIN_FILE=<path_to_vcpkg>/scripts/buildsystems/vcpkg.cmake ..```
-4. ```cmake -B build .```
-5. ```cmake --build build --config Release```
-6. ```./build/Drawing_Spells_Simulator```
-
 # How to Cast Spells
 Levels are casted based on 2 identifiers
 1. spell level
@@ -71,3 +56,29 @@ Casting Cone Of Cold
 Casting Telekinesis 
 
 ![image](https://github.com/user-attachments/assets/87c0a7c8-be78-4d1e-958b-a1f01827f829)
+
+## installation (For the code snoopers)
+Using Visual Studio 2022:
+1. clone and open Visual Studio 2022
+2. vcpkg install
+3. build all
+4. run game
+
+Using CMD:
+1. Clone the repository:
+   ```sh
+   git clone <repo_url>
+   ```
+
+2. Run the following commands:
+   ```sh
+   Remove-Item -Recurse -Force build
+   cmake --preset x64-debug
+   cmake --build build/x64-debug --config Debug
+   cmake --install build/x64-debug --config Debug --prefix dist
+   ```
+
+3. Execute the program:
+   ```sh
+   ./dist/YourProgram.exe
+   ```
